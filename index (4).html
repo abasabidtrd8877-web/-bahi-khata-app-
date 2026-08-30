@@ -1,0 +1,1770 @@
+<!DOCTYPE html>
+<html lang="ur-PK">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bahi Khata — Wholesale Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F7F3E9;
+  --paper-line:#eadfc3;
+  --ink:#2B2420;
+  --ink-soft:#7a6c56;
+  --maroon:#8C2F39;
+  --maroon-dark:#6d2029;
+  --teal:#1F5C56;
+  --teal-dark:#153f3b;
+  --gold:#C08A28;
+  --border:#D9CFBB;
+  --white:#FFFDF8;
+  --danger:#a33232;
+  --radius:10px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;}
+body{
+  font-family:'Inter',sans-serif;
+  background:
+    repeating-linear-gradient(var(--paper) 0px, var(--paper) 27px, var(--paper-line) 28px),
+    var(--paper);
+  color:var(--ink);
+  min-height:100vh;
+}
+h1,h2,h3,.display{font-family:'Fraunces',serif;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+::selection{background:var(--gold);color:var(--white);}
+button{font-family:inherit;cursor:pointer;}
+input,select,textarea{font-family:inherit;}
+
+/* ---------- LOGIN ---------- */
+#loginScreen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;
+  padding:20px;
+}
+.brandmark{
+  display:flex;align-items:center;gap:14px;margin-bottom:34px;
+}
+.brandmark .stamp{
+  width:56px;height:56px;border-radius:50%;border:3px solid var(--maroon);
+  display:flex;align-items:center;justify-content:center;color:var(--maroon);
+  font-family:'Fraunces',serif;font-weight:900;font-size:22px;transform:rotate(-8deg);
+  flex-shrink:0;
+}
+.brandmark .titles h1{margin:0;font-size:28px;font-weight:700;color:var(--ink);letter-spacing:.5px;}
+.brandmark .titles p{margin:2px 0 0;font-size:13px;color:var(--ink-soft);}
+
+.pinCard{
+  background:var(--white);border:1px solid var(--border);border-radius:16px;
+  padding:32px 28px;width:340px;box-shadow:0 2px 0 var(--border), 0 18px 40px -20px rgba(43,36,32,.35);
+}
+.pinCard label{font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:var(--ink-soft);font-weight:600;}
+.pinDisplay{
+  margin:14px 0 20px;display:flex;gap:10px;justify-content:center;
+}
+.pinDot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);transition:.15s;}
+.pinDot.filled{background:var(--maroon);border-color:var(--maroon);}
+.pinPad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.pinPad button{
+  background:var(--paper);border:1px solid var(--border);border-radius:10px;
+  padding:14px 0;font-size:19px;font-weight:600;color:var(--ink);
+}
+.pinPad button:active{background:var(--gold);color:var(--white);}
+.pinPad button.wide{grid-column:span 1;font-size:13px;color:var(--ink-soft);}
+#loginError{color:var(--danger);font-size:12.5px;text-align:center;min-height:18px;margin-top:10px;font-weight:600;}
+.pinHint{margin-top:18px;font-size:11.5px;color:var(--ink-soft);text-align:center;line-height:1.6;}
+
+/* ---------- SHELL ---------- */
+#appShell{display:none;min-height:100vh;}
+#sidebar{
+  width:230px;flex-shrink:0;background:var(--ink);color:var(--paper);
+  padding:22px 0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+#sidebar .side-brand{padding:0 20px 18px;border-bottom:1px solid rgba(247,243,233,.12);margin-bottom:10px;}
+#sidebar .side-brand .stamp2{
+  width:34px;height:34px;border-radius:50%;border:2px solid var(--gold);color:var(--gold);
+  display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:900;
+  transform:rotate(-8deg);margin-bottom:8px;
+}
+#sidebar .side-brand div.name{font-family:'Fraunces',serif;font-size:17px;font-weight:700;}
+#sidebar .side-brand div.role{font-size:11px;color:#c9bfa0;text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+.navItem{
+  display:flex;align-items:center;gap:10px;padding:11px 20px;font-size:14px;color:#e4dcc5;
+  border-left:3px solid transparent;cursor:pointer;transition:.12s;
+}
+.navItem:hover{background:rgba(247,243,233,.06);}
+.navItem.active{background:rgba(192,138,40,.16);border-left-color:var(--gold);color:var(--white);font-weight:600;}
+.navItem .ic{width:20px;text-align:center;}
+#sidebar .logout{margin-top:auto;padding:16px 20px 4px;}
+#sidebar .logout button{
+  width:100%;background:transparent;border:1px solid rgba(247,243,233,.25);color:#e4dcc5;
+  padding:9px;border-radius:8px;font-size:13px;
+}
+#sidebar .logout button:hover{border-color:var(--maroon);color:var(--white);background:var(--maroon);}
+
+#main{flex:1;min-width:0;}
+#topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 30px;border-bottom:1px solid var(--border);background:rgba(255,253,248,.6);
+  position:sticky;top:0;z-index:5;backdrop-filter:blur(4px);
+}
+#topbar h2{margin:0;font-size:21px;font-weight:700;}
+#topbar .sub{font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+#content{padding:26px 30px 60px;}
+
+/* ---------- COMPONENTS ---------- */
+.grid{display:grid;gap:16px;}
+.grid-4{grid-template-columns:repeat(4,1fr);}
+.grid-2{grid-template-columns:repeat(2,1fr);}
+@media(max-width:900px){.grid-4{grid-template-columns:repeat(2,1fr);}.grid-2{grid-template-columns:1fr;}}
+
+.card{
+  background:var(--white);border:1px solid var(--border);border-radius:var(--radius);
+  padding:18px 20px;
+}
+.statCard{position:relative;overflow:hidden;}
+.statCard .label{font-size:11.5px;text-transform:uppercase;letter-spacing:1px;color:var(--ink-soft);font-weight:600;}
+.statCard .value{font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:700;margin-top:6px;}
+.statCard.maroon .value{color:var(--maroon);}
+.statCard.teal .value{color:var(--teal);}
+.statCard.gold .value{color:var(--gold);}
+.statCard.ink .value{color:var(--ink);}
+
+.sectionHead{display:flex;align-items:center;justify-content:space-between;margin:28px 0 14px;}
+.sectionHead h3{margin:0;font-size:16px;font-weight:700;}
+.sectionHead:first-child{margin-top:0;}
+
+.btn{
+  border:1px solid var(--border);background:var(--white);color:var(--ink);
+  padding:9px 16px;border-radius:8px;font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;
+}
+.btn:hover{border-color:var(--ink);}
+.btn-primary{background:var(--maroon);border-color:var(--maroon);color:var(--white);}
+.btn-primary:hover{background:var(--maroon-dark);}
+.btn-teal{background:var(--teal);border-color:var(--teal);color:var(--white);}
+.btn-teal:hover{background:var(--teal-dark);}
+.btn-ghost{background:transparent;border-color:transparent;color:var(--ink-soft);padding:6px 8px;}
+.btn-ghost:hover{color:var(--maroon);}
+.btn-sm{padding:6px 11px;font-size:12.5px;}
+.btn-danger{color:var(--danger);border-color:var(--border);}
+.btn-danger:hover{border-color:var(--danger);background:#fbeceb;}
+.btn:disabled{opacity:.4;cursor:not-allowed;}
+
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+thead th{
+  text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--ink-soft);
+  padding:9px 10px;border-bottom:2px solid var(--border);font-weight:700;
+}
+tbody td{padding:11px 10px;border-bottom:1px solid var(--paper-line);vertical-align:middle;}
+tbody tr:hover{background:rgba(192,138,40,.06);}
+.tableWrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;overflow-x:auto;}
+
+.badge{
+  display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700;
+  text-transform:uppercase;letter-spacing:.5px;
+}
+.badge.approved{background:#e3efe9;color:var(--teal-dark);}
+.badge.pending{background:#fbf1dc;color:#8a5f0f;}
+.badge.rejected{background:#f9e3e1;color:var(--danger);}
+.badge.low{background:#fbf1dc;color:#8a5f0f;}
+.badge.out{background:#f9e3e1;color:var(--danger);}
+.badge.ok{background:#e3efe9;color:var(--teal-dark);}
+
+.stampBadge{
+  display:inline-block;border:2px solid currentColor;border-radius:8px;padding:2px 9px;
+  font-family:'Fraunces',serif;font-weight:900;font-size:11px;letter-spacing:1px;transform:rotate(-4deg);
+}
+.stampBadge.approved{color:var(--teal-dark);}
+.stampBadge.pending{color:var(--gold);}
+.stampBadge.rejected{color:var(--danger);}
+
+.searchRow{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+input[type=text],input[type=number],input[type=password],input[type=date],select,textarea{
+  border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-size:13.5px;background:var(--white);color:var(--ink);
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--maroon);}
+.formGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.formGrid label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--ink-soft);font-weight:600;}
+.formGrid label input,.formGrid label select,.formGrid label textarea{width:100%;}
+.formGrid .full{grid-column:1/-1;}
+
+/* modal */
+.overlay{
+  position:fixed;inset:0;background:rgba(43,36,32,.45);display:none;align-items:flex-start;justify-content:center;
+  z-index:50;padding:40px 16px;overflow-y:auto;
+}
+.overlay.show{display:flex;}
+.modal{
+  background:var(--white);border-radius:14px;padding:24px 26px;width:100%;max-width:480px;
+  box-shadow:0 30px 60px -20px rgba(0,0,0,.4);
+  border:1px solid var(--border);
+}
+.modal.wide{max-width:680px;}
+.modal h3{margin:0 0 16px;font-size:18px;}
+.modal .actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px;}
+
+.autoWrap{position:relative;}
+.autoList{
+  position:absolute;top:100%;left:0;right:0;background:var(--white);border:1px solid var(--border);
+  border-radius:8px;margin-top:4px;max-height:200px;overflow-y:auto;z-index:20;box-shadow:0 10px 25px -10px rgba(0,0,0,.25);
+  display:none;
+}
+.autoList.show{display:block;}
+.autoList .opt{padding:9px 12px;font-size:13px;cursor:pointer;}
+.autoList .opt.hi,.autoList .opt:hover{background:var(--gold);color:var(--white);}
+.autoList .opt small{display:block;color:inherit;opacity:.75;font-size:11px;}
+
+.empty{padding:40px 20px;text-align:center;color:var(--ink-soft);}
+.empty .ic{font-size:30px;margin-bottom:8px;}
+
+.perf{border-top:2px dashed var(--border);margin:22px 0;}
+
+.circleWrap{display:flex;align-items:center;gap:22px;flex-wrap:wrap;}
+.circleWrap .num{font-family:'IBM Plex Mono',monospace;}
+
+.pillTabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.pillTabs button{
+  border:1px solid var(--border);background:var(--white);padding:7px 15px;border-radius:20px;font-size:12.5px;font-weight:600;color:var(--ink-soft);
+}
+.pillTabs button.active{background:var(--ink);color:var(--white);border-color:var(--ink);}
+
+.itemsBox{border:1px solid var(--border);border-radius:8px;padding:10px;margin-top:6px;}
+.itemRow{display:grid;grid-template-columns:2fr 70px 90px 90px 30px;gap:8px;align-items:center;margin-bottom:8px;}
+.itemRow input,.itemRow select{width:100%;}
+.totalLine{display:flex;justify-content:space-between;font-size:15px;font-weight:700;padding-top:10px;border-top:1px solid var(--border);margin-top:6px;}
+
+.toast{
+  position:fixed;bottom:22px;right:22px;background:var(--ink);color:var(--white);padding:12px 18px;
+  border-radius:9px;font-size:13.5px;box-shadow:0 10px 25px -10px rgba(0,0,0,.4);z-index:100;
+  opacity:0;transform:translateY(8px);transition:.25s;
+}
+.toast.show{opacity:1;transform:translateY(0);}
+
+@media(max-width:820px){
+  #appShell{flex-direction:column;}
+  #sidebar{width:100%;height:auto;position:relative;flex-direction:row;flex-wrap:wrap;padding:14px;}
+  #sidebar .side-brand{display:none;}
+  #sidebar .logout{margin-top:0;padding:0 0 0 auto;}
+  .navItem{padding:8px 12px;border-left:none;border-radius:8px;}
+  .formGrid{grid-template-columns:1fr;}
+  .grid-4{grid-template-columns:1fr 1fr;}
+  #content{padding:18px;}
+  #topbar{padding:14px 18px;}
+}
+@media print{
+  #sidebar,#topbar,.no-print{display:none !important;}
+  body{background:#fff;}
+  #content{padding:0;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="brandmark">
+    <div class="stamp">BK</div>
+    <div class="titles">
+      <h1>Bahi Khata</h1>
+      <p>Wholesale &amp; Distribution Manager</p>
+    </div>
+  </div>
+  <div class="pinCard">
+    <label>Apna PIN darj karein</label>
+    <div class="pinDisplay" id="pinDisplay"></div>
+    <div class="pinPad">
+      <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+      <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+      <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+      <button class="wide" id="pinClear">Clear</button><button data-k="0">0</button><button class="wide" id="pinBack">⌫</button>
+    </div>
+    <div id="loginError"></div>
+    <div class="pinHint">Admin: 1111 &nbsp;•&nbsp; Order Booker: 2222 / 3333 &nbsp;•&nbsp; Stock Reporter: 7777</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appShell">
+  <div id="sidebar">
+    <div class="side-brand">
+      <div class="stamp2">BK</div>
+      <div class="name">Bahi Khata</div>
+      <div class="role" id="sideRole">—</div>
+    </div>
+    <div id="navList"></div>
+    <div class="logout"><button id="logoutBtn">Logout</button></div>
+  </div>
+  <div id="main">
+    <div id="topbar">
+      <div>
+        <h2 id="viewTitle">Dashboard</h2>
+        <div class="sub" id="viewSub"></div>
+      </div>
+      <div class="sub mono" id="clockBox"></div>
+    </div>
+    <div id="content"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay"><div class="modal" id="modalBox"></div></div>
+<div class="toast" id="toast"></div>
+
+<!-- Firebase (Realtime Database) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCKZ2xX4Jf-LmBbthuV9852-TdhMVRK8DM",
+  authDomain: "master-foods-warsak-road.firebaseapp.com",
+  databaseURL: "https://master-foods-warsak-road-default-rtdb.firebaseio.com",
+  projectId: "master-foods-warsak-road",
+  storageBucket: "master-foods-warsak-road.firebasestorage.app",
+  messagingSenderId: "1046199814932",
+  appId: "1:1046199814932:web:a16b22154748b118bf5001"
+};
+firebase.initializeApp(firebaseConfig);
+const fbdb = firebase.database();
+</script>
+<script>
+/* ============================================================
+   DATA LAYER
+============================================================ */
+const USERS = {
+  '1111': {role:'admin', id:'admin', name:'Admin'},
+  '2222': {role:'ob', id:'ob2222', name:'Order Booker 1'},
+  '3333': {role:'ob', id:'ob3333', name:'Order Booker 2'},
+  '7777': {role:'stock', id:'stock7777', name:'Stock Reporter'}
+};
+const OB_IDS = ['ob2222','ob3333'];
+const OB_NAMES = {ob2222:'Order Booker 1', ob3333:'Order Booker 2'};
+
+let CUR = null; // current user
+let DB = {
+  customers: [],
+  products: [],
+  bills: [],
+  wasoli: [],
+  godam: { stock:{}, moves:[] },
+  hisab: [],
+  targets: {}
+};
+let VER = {};
+
+function uid(){ return 'x'+Math.random().toString(36).slice(2,10)+Date.now().toString(36); }
+function money(n){ n = Number(n)||0; return n.toLocaleString('en-PK',{maximumFractionDigits:0}); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function monthStr(){ return new Date().toISOString().slice(0,7); }
+function fmtDate(iso){ const d=new Date(iso); return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); }
+function fmtTime(iso){ const d=new Date(iso); return d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}); }
+
+const DATA_KEYS = ['customers','products','bills','wasoli','godam','hisab','targets'];
+function defaultFor(key){
+  if(key==='godam') return { stock:{}, moves:[] };
+  if(key==='targets') return {};
+  return [];
+}
+// Firebase RTDB drops empty arrays/objects and can reorder array-likes into
+// objects — normalize back into the array/object shape our code expects.
+function normalize(key, val){
+  if(val===null || val===undefined) return defaultFor(key);
+  if(key==='godam'){
+    return { stock: val.stock || {}, moves: Array.isArray(val.moves) ? val.moves : Object.values(val.moves||{}) };
+  }
+  if(key==='targets') return val;
+  return Array.isArray(val) ? val : Object.values(val);
+}
+let listenersReady = false;
+function loadAll(){
+  return Promise.all(DATA_KEYS.map(k => new Promise((resolve)=>{
+    let first = true;
+    fbdb.ref(k).on('value', (snap)=>{
+      DB[k] = normalize(k, snap.val());
+      if(first){ first = false; resolve(); }
+      else if(listenersReady && !document.getElementById('overlay').classList.contains('show')){
+        render(currentView);
+      }
+    }, (err)=>{
+      if(first){ first=false; resolve(); }
+      showToast('⚠ Firebase se connect nahi ho saka — rules check karein');
+    });
+  }))).then(()=>{ listenersReady = true; });
+}
+async function save(key){
+  try{
+    await fbdb.ref(key).set(DB[key]);
+  }catch(e){
+    showToast('⚠ Save nahi hua — internet ya Firebase rules check karein');
+  }
+}
+
+/* ============================================================
+   LOGIN
+============================================================ */
+let pinBuf = '';
+function renderPinDisplay(){
+  const el = document.getElementById('pinDisplay');
+  el.innerHTML = '';
+  for(let i=0;i<4;i++){
+    const d = document.createElement('div');
+    d.className = 'pinDot'+(i<pinBuf.length?' filled':'');
+    el.appendChild(d);
+  }
+}
+document.querySelectorAll('.pinPad button[data-k]').forEach(b=>{
+  b.addEventListener('click',()=>{
+    if(pinBuf.length>=4) return;
+    pinBuf += b.dataset.k;
+    renderPinDisplay();
+    document.getElementById('loginError').textContent='';
+    if(pinBuf.length===4) attemptLogin();
+  });
+});
+document.getElementById('pinClear').addEventListener('click',()=>{ pinBuf=''; renderPinDisplay(); });
+document.getElementById('pinBack').addEventListener('click',()=>{ pinBuf = pinBuf.slice(0,-1); renderPinDisplay(); });
+
+async function attemptLogin(){
+  const u = USERS[pinBuf];
+  if(!u){
+    document.getElementById('loginError').textContent = 'Ghalat PIN — dobara koshish karein';
+    setTimeout(()=>{ pinBuf=''; renderPinDisplay(); },500);
+    return;
+  }
+  CUR = u;
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appShell').style.display='flex';
+  await loadAll();
+  await ensureCustomerCodes();
+  buildNav();
+  goto('dashboard');
+  startClock();
+}
+document.getElementById('logoutBtn').addEventListener('click',()=>{
+  CUR=null; pinBuf=''; renderPinDisplay();
+  document.getElementById('appShell').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+});
+function startClock(){
+  const box = document.getElementById('clockBox');
+  function tick(){ box.textContent = new Date().toLocaleString('en-GB',{weekday:'short',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); }
+  tick(); setInterval(tick,30000);
+}
+
+/* ============================================================
+   NAV
+============================================================ */
+const NAV = {
+  admin: [
+    ['dashboard','📊','Dashboard'],
+    ['pending','⏳','Pending'],
+    ['wasoli','💰','Wasoli'],
+    ['billing','🧾','Billing'],
+    ['loading','🚚','Loading Sheet'],
+    ['godam','🏭','Godam'],
+    ['ledger','📒','Ledger'],
+    ['hisab','📅','Daily Hisab'],
+    ['products','📦','Products'],
+    ['customers','👥','Customers'],
+    ['targets','🎯','OB Targets'],
+  ],
+  ob: [
+    ['dashboard','📊','Dashboard'],
+    ['wasoli','💰','Wasoli'],
+    ['billing','🧾','Billing'],
+    ['godam','🏭','Godam'],
+    ['ledger','📒','Ledger'],
+    ['products','📦','Products'],
+    ['customers','👥','Customers'],
+    ['targets','🎯','Mera Target'],
+  ],
+  stock: [
+    ['dashboard','📊','Dashboard'],
+    ['loading','🚚','Loading Sheet'],
+    ['godam','🏭','Godam'],
+  ]
+};
+let currentView = 'dashboard';
+function buildNav(){
+  document.getElementById('sideRole').textContent = CUR.name;
+  const list = document.getElementById('navList');
+  list.innerHTML='';
+  NAV[CUR.role].forEach(([key,ic,label])=>{
+    const d = document.createElement('div');
+    d.className = 'navItem'+(key===currentView?' active':'');
+    d.dataset.view = key;
+    d.innerHTML = `<span class="ic">${ic}</span><span>${label}</span>`;
+    d.addEventListener('click',()=>goto(key));
+    list.appendChild(d);
+  });
+}
+const TITLES = {
+  dashboard:['Dashboard','Aaj ka khulasa'],
+  pending:['Pending','OB ki orders aur wasoli approve/reject karein'],
+  wasoli:['Wasoli','Collection darj karein'],
+  billing:['Billing','Bill banayein, edit karein, mal wapsi'],
+  loading:['Loading Sheet','Gadi loading — godam se auto minus'],
+  godam:['Godam','Stock jama, low/out of stock alerts'],
+  ledger:['Ledger','Customer ka poora hisab'],
+  hisab:['Daily Hisab','Wasoli, kharcha, company payment'],
+  products:['Products','Add, rate change, delete, category'],
+  customers:['Customers','Add, edit, delete, search'],
+  targets:['OB Targets','Monthly target aur progress'],
+};
+function goto(view){
+  currentView = view;
+  document.querySelectorAll('.navItem').forEach(n=>n.classList.toggle('active', n.dataset.view===view));
+  const t = TITLES[view] || ['',''];
+  document.getElementById('viewTitle').textContent = t[0];
+  document.getElementById('viewSub').textContent = t[1];
+  render(view);
+}
+
+/* ============================================================
+   HELPERS: toast / modal
+============================================================ */
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._h);
+  t._h = setTimeout(()=>t.classList.remove('show'),2400);
+}
+function openModal(html){
+  document.getElementById('modalBox').innerHTML = html;
+  document.getElementById('overlay').classList.add('show');
+}
+function closeModal(){
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('modalBox').innerHTML='';
+}
+document.getElementById('overlay').addEventListener('click',e=>{
+  if(e.target.id==='overlay') closeModal();
+});
+
+function statusBadge(s){
+  const map = {approved:'Approved', pending:'Pending', rejected:'Rejected'};
+  return `<span class="badge ${s}">${map[s]||s}</span>`;
+}
+function stampBadge(s){
+  const map = {approved:'APPROVED', pending:'PENDING', rejected:'REJECTED'};
+  return `<span class="stampBadge ${s}">${map[s]||s}</span>`;
+}
+
+/* ============================================================
+   WHATSAPP HELPER
+============================================================ */
+function waLink(phone, text){
+  let p = (phone||'').replace(/[^0-9]/g,'');
+  if(p.startsWith('0')) p = '92'+p.slice(1);
+  if(!p.startsWith('92') && p.length===10) p = '92'+p;
+  return `https://wa.me/${p}?text=${encodeURIComponent(text)}`;
+}
+
+/* ============================================================
+   CUSTOMER AUTOCOMPLETE (arrow keys + enter)
+============================================================ */
+function attachAutocomplete(inputId, listId, hiddenId, items, onPick){
+  const input = document.getElementById(inputId);
+  const list = document.getElementById(listId);
+  let hi = -1, filtered = [];
+  function renderList(){
+    const q = input.value.trim().toLowerCase();
+    filtered = items.filter(it => !q || it.name.toLowerCase().includes(q) || (it.phone||'').includes(q));
+    if(!filtered.length || !document.activeElement===input){}
+    list.innerHTML = filtered.slice(0,30).map((it,i)=>
+      `<div class="opt${i===hi?' hi':''}" data-i="${i}">${it.name}<small>${it.phone||''}${it.balance!==undefined?' • Bal: Rs '+money(it.balance):''}</small></div>`
+    ).join('') || `<div class="opt" style="opacity:.6">Koi customer nahi mila</div>`;
+    list.classList.toggle('show', document.activeElement===input);
+  }
+  input.addEventListener('focus',()=>{ hi=-1; renderList(); });
+  input.addEventListener('input',()=>{ hi=-1; document.getElementById(hiddenId).value=''; renderList(); });
+  input.addEventListener('keydown',(e)=>{
+    if(!list.classList.contains('show')) return;
+    if(e.key==='ArrowDown'){ e.preventDefault(); hi = Math.min(hi+1, filtered.length-1); renderList(); scrollHi(); }
+    else if(e.key==='ArrowUp'){ e.preventDefault(); hi = Math.max(hi-1,0); renderList(); scrollHi(); }
+    else if(e.key==='Enter'){ e.preventDefault(); if(hi>=0 && filtered[hi]) pick(filtered[hi]); }
+    else if(e.key==='Escape'){ list.classList.remove('show'); }
+  });
+  function scrollHi(){ const el=list.querySelector('.opt.hi'); if(el) el.scrollIntoView({block:'nearest'}); }
+  list.addEventListener('mousedown',(e)=>{
+    const opt = e.target.closest('.opt');
+    if(!opt || opt.dataset.i===undefined) return;
+    pick(filtered[+opt.dataset.i]);
+  });
+  function pick(it){
+    input.value = it.name;
+    document.getElementById(hiddenId).value = it.id;
+    list.classList.remove('show');
+    if(onPick) onPick(it);
+  }
+  document.addEventListener('click',(e)=>{
+    if(e.target!==input && !list.contains(e.target)) list.classList.remove('show');
+  });
+}
+
+/* ============================================================
+   SCOPE HELPERS (who sees what)
+============================================================ */
+function visibleCustomers(){
+  return DB.customers; // customers ab sab Order Bookers ke liye shared/open hain
+}
+function visibleBills(){
+  if(CUR.role==='ob') return DB.bills.filter(b=>b.obId===CUR.id);
+  return DB.bills;
+}
+function visibleWasoli(){
+  if(CUR.role==='ob') return DB.wasoli.filter(w=>w.obId===CUR.id);
+  return DB.wasoli;
+}
+function custBalance(custId, excludeBillId){
+  let bal = 0;
+  DB.bills.filter(b=>b.customerId===custId && b.status==='approved' && b.id!==excludeBillId).forEach(b=>{
+    bal += b.type==='return' ? -b.total : b.total;
+  });
+  DB.wasoli.filter(w=>w.customerId===custId && w.status==='approved').forEach(w=>{ bal -= w.amount; });
+  return bal;
+}
+function stockOf(pid){ return DB.godam.stock[pid] || 0; }
+function productName(pid){ const p = DB.products.find(p=>p.id===pid); return p? p.name : '—'; }
+function customerName(cid){ const c = DB.customers.find(c=>c.id===cid); return c? c.name : '—'; }
+function personName(id){ if(!id) return 'Admin'; return OB_NAMES[id] || (id===('admin')?'Admin':id); }
+function balLine(bal){ return `Rs ${money(Math.abs(bal))} ${bal>0?'(Baqi)':bal<0?'(Advance)':''}`; }
+
+/* ============================================================
+   RENDER ROUTER
+============================================================ */
+function render(view){
+  const c = document.getElementById('content');
+  const fns = {
+    dashboard: renderDashboard, pending: renderPending, wasoli: renderWasoli,
+    billing: renderBilling, loading: renderLoading, godam: renderGodam,
+    ledger: renderLedger, hisab: renderHisab, products: renderProducts,
+    customers: renderCustomers, targets: renderTargets
+  };
+  c.innerHTML = '';
+  (fns[view]||renderDashboard)(c);
+}
+
+/* ============================================================
+   DASHBOARD
+============================================================ */
+function renderDashboard(root){
+  const today = todayStr();
+  const salesToday = DB.bills.filter(b=>b.status==='approved' && b.type==='sale' && b.createdAt.slice(0,10)===today && (CUR.role!=='ob'||b.obId===CUR.id));
+  const saleTotal = salesToday.reduce((s,b)=>s+b.total,0);
+  const wasoliToday = DB.wasoli.filter(w=>w.status==='approved' && w.createdAt.slice(0,10)===today && (CUR.role!=='ob'||w.obId===CUR.id));
+  const wasoliTotal = wasoliToday.reduce((s,w)=>s+w.amount,0);
+  const pendingCount = DB.bills.filter(b=>b.status==='pending').length + DB.wasoli.filter(w=>w.status==='pending').length;
+  const outCount = DB.products.filter(p=>stockOf(p.id)<=0).length;
+  const lowCount = DB.products.filter(p=>stockOf(p.id)>0 && stockOf(p.id)<10).length;
+
+  let html = `<div class="grid grid-4">
+    <div class="card statCard maroon"><div class="label">Aaj ki Sale</div><div class="value mono">Rs ${money(saleTotal)}</div></div>
+    <div class="card statCard teal"><div class="label">Aaj ki Wasoli</div><div class="value mono">Rs ${money(wasoliTotal)}</div></div>`;
+  if(CUR.role==='admin'){
+    html += `<div class="card statCard gold"><div class="label">Pending Approvals</div><div class="value mono">${pendingCount}</div></div>
+    <div class="card statCard ink"><div class="label">Out of Stock</div><div class="value mono">${outCount}</div></div>`;
+  } else if(CUR.role==='stock'){
+    html += `<div class="card statCard gold"><div class="label">Low Stock</div><div class="value mono">${lowCount}</div></div>
+    <div class="card statCard ink"><div class="label">Out of Stock</div><div class="value mono">${outCount}</div></div>`;
+  } else {
+    const mine = visibleBills().filter(b=>b.status==='pending').length;
+    html += `<div class="card statCard gold"><div class="label">Meri Pending</div><div class="value mono">${mine}</div></div>
+    <div class="card statCard ink"><div class="label">Mere Customers</div><div class="value mono">${visibleCustomers().length}</div></div>`;
+  }
+  html += `</div>`;
+
+  if(CUR.role==='admin'){
+    html += `<div class="sectionHead"><h3>Hal hi ki Activity</h3></div>`;
+    const recent = [...DB.bills, ...DB.wasoli].sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt)).slice(0,8);
+    if(!recent.length){ html += emptyBlock('📭','Abhi tak koi activity nahi'); }
+    else{
+      html += `<div class="tableWrap"><table><thead><tr><th>Waqt</th><th>Type</th><th>Customer</th><th>Amount</th><th>Status</th><th>By</th></tr></thead><tbody>`;
+      recent.forEach(r=>{
+        const isBill = r.total!==undefined && r.items;
+        html += `<tr>
+          <td class="mono">${fmtDate(r.createdAt)} ${fmtTime(r.createdAt)}</td>
+          <td>${isBill ? (r.type==='return'?'Mal Wapsi':'Bill') : 'Wasoli'}</td>
+          <td>${customerName(r.customerId)}</td>
+          <td class="mono">Rs ${money(isBill?r.total:r.amount)}</td>
+          <td>${statusBadge(r.status)}</td>
+          <td>${OB_NAMES[r.createdBy]||r.createdBy}</td>
+        </tr>`;
+      });
+      html += `</tbody></table></div>`;
+    }
+  }
+  root.innerHTML = html;
+}
+function emptyBlock(ic,msg){
+  return `<div class="empty card"><div class="ic">${ic}</div>${msg}</div>`;
+}
+
+/* ============================================================
+   CUSTOMERS
+============================================================ */
+function customerCode(c){ return c.code || 'C-????'; }
+function nextCustomerCode(){
+  let max = 0;
+  DB.customers.forEach(c=>{ const n = parseInt((c.code||'').replace(/\D/g,''))||0; if(n>max) max=n; });
+  return 'C-'+String(max+1).padStart(4,'0');
+}
+async function ensureCustomerCodes(){
+  let max = 0, changed = false;
+  DB.customers.forEach(c=>{ const n = parseInt((c.code||'').replace(/\D/g,''))||0; if(n>max) max=n; });
+  DB.customers.forEach(c=>{ if(!c.code){ max++; c.code = 'C-'+String(max).padStart(4,'0'); changed=true; } });
+  if(changed) await save('customers');
+}
+function renderCustomers(root){
+  root.innerHTML = `
+    <div class="searchRow">
+      <input type="text" id="custSearch" placeholder="Naam, phone ya ID se search karein..." style="flex:1;min-width:220px;">
+      <button class="btn btn-primary" id="addCustBtn">+ Naya Customer</button>
+    </div>
+    <div id="custTableWrap"></div>
+  `;
+  document.getElementById('addCustBtn').addEventListener('click', ()=>openCustomerModal());
+  document.getElementById('custSearch').addEventListener('input', drawCustTable);
+  drawCustTable();
+
+  function drawCustTable(){
+    const q = document.getElementById('custSearch').value.trim().toLowerCase();
+    let list = visibleCustomers();
+    if(q) list = list.filter(c=> c.name.toLowerCase().includes(q) || (c.phone||'').includes(q) || customerCode(c).toLowerCase().includes(q));
+    let html;
+    if(!list.length){
+      html = emptyBlock('👥','Koi customer nahi mila. Naya customer add karein.');
+    } else {
+      html = `<div class="tableWrap"><table><thead><tr><th>ID</th><th>Naam</th><th>Phone</th><th>Address</th><th>Balance</th><th>Added By</th><th></th></tr></thead><tbody>`;
+      list.forEach(c=>{
+        const bal = custBalance(c.id);
+        html += `<tr>
+          <td class="mono">${customerCode(c)}</td>
+          <td><strong>${c.name}</strong></td>
+          <td class="mono">${c.phone||'-'}</td>
+          <td>${c.address||'-'}</td>
+          <td class="mono" style="color:${bal>0?'var(--maroon)':'var(--teal)'}">Rs ${money(Math.abs(bal))} ${bal>0?'(Wasoli baqi)':bal<0?'(Advance)':''}</td>
+          <td>${c.obId ? (OB_NAMES[c.obId]||c.obId) : 'Admin'}</td>
+          <td style="white-space:nowrap">
+            <button class="btn btn-ghost btn-sm" data-edit="${c.id}">✏️</button>
+            <button class="btn btn-ghost btn-sm" data-del="${c.id}">🗑️</button>
+          </td>
+        </tr>`;
+      });
+      html += `</tbody></table></div>`;
+    }
+    document.getElementById('custTableWrap').innerHTML = html;
+    document.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>openCustomerModal(b.dataset.edit)));
+    document.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>delCustomer(b.dataset.del)));
+  }
+}
+function openCustomerModal(id){
+  const editing = id ? DB.customers.find(c=>c.id===id) : null;
+  openModal(`
+    <h3>${editing?'Customer Edit Karein':'Naya Customer'}</h3>
+    ${editing?`<div class="mono" style="font-size:12.5px;color:var(--ink-soft);margin-bottom:10px;">ID: ${customerCode(editing)}</div>`:''}
+    <div class="formGrid">
+      <label class="full">Naam<input type="text" id="cf_name" value="${editing?editing.name:''}"></label>
+      <label>Phone<input type="text" id="cf_phone" value="${editing?editing.phone||'':''}" placeholder="03xxxxxxxxx"></label>
+      <label>Address<input type="text" id="cf_addr" value="${editing?editing.address||'':''}"></label>
+    </div>
+    <div id="cf_err" style="color:var(--danger);font-size:12.5px;margin-top:8px;"></div>
+    <div class="actions">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="cf_save">${editing?'Update':'Save'}</button>
+    </div>
+  `);
+  document.getElementById('cf_save').addEventListener('click', async ()=>{
+    const name = document.getElementById('cf_name').value.trim();
+    const phone = document.getElementById('cf_phone').value.trim();
+    const addr = document.getElementById('cf_addr').value.trim();
+    if(!name){ document.getElementById('cf_err').textContent = 'Naam zaroori hai'; return; }
+    const dup = DB.customers.find(c => c.phone && phone && c.phone===phone && c.id!==id);
+    if(dup){ document.getElementById('cf_err').textContent = `Yeh phone number pehle se "${dup.name}" ke naam par darj hai (duplicate block)`; return; }
+    if(editing){
+      editing.name=name; editing.phone=phone; editing.address=addr;
+    } else {
+      DB.customers.push({id:uid(), code: nextCustomerCode(), name, phone, address:addr, obId: CUR.role==='ob'?CUR.id:null, createdBy:CUR.id, createdAt:new Date().toISOString()});
+    }
+    await save('customers');
+    closeModal(); showToast('Customer save ho gaya'); render('customers');
+  });
+}
+async function delCustomer(id){
+  if(!confirm('Customer delete karein?')) return;
+  DB.customers = DB.customers.filter(c=>c.id!==id);
+  await save('customers');
+  showToast('Customer delete ho gaya'); render('customers');
+}
+
+/* ============================================================
+   PRODUCTS
+============================================================ */
+function resizeImageFile(file, maxDim, quality){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = ()=>{
+      const img = new Image();
+      img.onerror = reject;
+      img.onload = ()=>{
+        let w = img.width, h = img.height;
+        if(w > h){ if(w > maxDim){ h = Math.round(h*maxDim/w); w = maxDim; } }
+        else{ if(h > maxDim){ w = Math.round(w*maxDim/h); h = maxDim; } }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+function productThumb(p, size){
+  size = size || 44;
+  if(p.image){
+    return `<img src="${p.image}" style="width:${size}px;height:${size}px;object-fit:cover;border-radius:8px;border:1px solid var(--border);">`;
+  }
+  return `<div style="width:${size}px;height:${size}px;border-radius:8px;background:var(--paper-line);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:700;color:var(--ink-soft);">${(p.name||'?').charAt(0).toUpperCase()}</div>`;
+}
+function renderProducts(root){
+  const cats = [...new Set(DB.products.map(p=>p.category).filter(Boolean))];
+  root.innerHTML = `
+    <div class="searchRow">
+      <input type="text" id="prodSearch" placeholder="Product search karein..." style="flex:1;min-width:200px;">
+      <select id="catFilter"><option value="">Sab Categories</option>${cats.map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
+      <button class="btn btn-primary" id="addProdBtn">+ Naya Product</button>
+    </div>
+    <div id="prodTableWrap"></div>
+  `;
+  document.getElementById('addProdBtn').addEventListener('click', ()=>openProductModal());
+  document.getElementById('prodSearch').addEventListener('input', draw);
+  document.getElementById('catFilter').addEventListener('change', draw);
+  draw();
+  function draw(){
+    const q = document.getElementById('prodSearch').value.trim().toLowerCase();
+    const cat = document.getElementById('catFilter').value;
+    let list = DB.products.filter(p => (!q || p.name.toLowerCase().includes(q)) && (!cat || p.category===cat));
+    let html;
+    if(!list.length){ html = emptyBlock('📦','Koi product nahi mila.'); }
+    else{
+      html = `<div class="tableWrap"><table><thead><tr><th>Tasveer</th><th>Naam</th><th>Category</th><th>Rate</th><th>Stock</th><th></th></tr></thead><tbody>`;
+      list.forEach(p=>{
+        const st = stockOf(p.id);
+        html += `<tr>
+          <td>${productThumb(p)}</td>
+          <td><strong>${p.name}</strong></td>
+          <td>${p.category||'-'}</td>
+          <td class="mono">Rs ${money(p.rate)}</td>
+          <td class="mono">${st} ${st<=0?'<span class="badge out">Out</span>':st<10?'<span class="badge low">Low</span>':''}</td>
+          <td style="white-space:nowrap">
+            <button class="btn btn-ghost btn-sm" data-edit="${p.id}">✏️</button>
+            <button class="btn btn-ghost btn-sm" data-del="${p.id}">🗑️</button>
+          </td>
+        </tr>`;
+      });
+      html += `</tbody></table></div>`;
+    }
+    document.getElementById('prodTableWrap').innerHTML = html;
+    document.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>openProductModal(b.dataset.edit)));
+    document.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>delProduct(b.dataset.del)));
+  }
+}
+function openProductModal(id){
+  const editing = id ? DB.products.find(p=>p.id===id) : null;
+  let currentImage = editing ? (editing.image || '') : '';
+  openModal(`
+    <h3>${editing?'Product Edit Karein':'Naya Product'}</h3>
+    <div style="display:flex;gap:16px;align-items:flex-start;margin-bottom:14px;">
+      <div id="pf_preview">${currentImage ? `<img src="${currentImage}" style="width:80px;height:80px;object-fit:cover;border-radius:10px;border:1px solid var(--border);">` : `<div style="width:80px;height:80px;border-radius:10px;background:var(--paper-line);display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:11px;text-align:center;">Koi Tasveer Nahi</div>`}</div>
+      <div style="flex:1;">
+        <label style="font-size:12px;color:var(--ink-soft);font-weight:600;display:block;margin-bottom:5px;">Product ki Tasveer</label>
+        <input type="file" id="pf_image_input" accept="image/*" style="font-size:12.5px;">
+        <div style="margin-top:6px;">
+          <button type="button" class="btn btn-ghost btn-sm" id="pf_remove_img" style="${currentImage?'':'display:none;'}">🗑️ Tasveer Hatayein</button>
+        </div>
+      </div>
+    </div>
+    <div class="formGrid">
+      <label class="full">Naam<input type="text" id="pf_name" value="${editing?editing.name:''}"></label>
+      <label>Category<input type="text" id="pf_cat" value="${editing?editing.category||'':''}" placeholder="e.g. Grocery"></label>
+      <label>Rate (Rs)<input type="number" id="pf_rate" value="${editing?editing.rate:''}"></label>
+    </div>
+    <div id="pf_err" style="color:var(--danger);font-size:12.5px;margin-top:8px;"></div>
+    <div class="actions">
+      <button class="btn" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="pf_save">${editing?'Update':'Save'}</button>
+    </div>
+  `);
+  document.getElementById('pf_image_input').addEventListener('change', async (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    if(file.size > 8*1024*1024){ showToast('⚠ Tasveer 8MB se zyada bari hai'); return; }
+    try{
+      const dataUrl = await resizeImageFile(file, 300, 0.7);
+      currentImage = dataUrl;
+      document.getElementById('pf_preview').innerHTML = `<img src="${dataUrl}" style="width:80px;height:80px;object-fit:cover;border-radius:10px;border:1px solid var(--border);">`;
+      document.getElementById('pf_remove_img').style.display='inline-flex';
+    }catch(e2){ showToast('⚠ Tasveer load nahi ho saki'); }
+  });
+  document.getElementById('pf_remove_img').addEventListener('click', ()=>{
+    currentImage = '';
+    document.getElementById('pf_preview').innerHTML = `<div style="width:80px;height:80px;border-radius:10px;background:var(--paper-line);display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:11px;text-align:center;">Koi Tasveer Nahi</div>`;
+    document.getElementById('pf_remove_img').style.display='none';
+  });
+  document.getElementById('pf_save').addEventListener('click', async ()=>{
+    const name = document.getElementById('pf_name').value.trim();
+    const cat = document.getElementById('pf_cat').value.trim();
+    const rate = parseFloat(document.getElementById('pf_rate').value)||0;
+    if(!name){ document.getElementById('pf_err').textContent='Naam zaroori hai'; return; }
+    if(editing){ editing.name=name; editing.category=cat; editing.rate=rate; editing.image=currentImage; }
+    else{
+      const p = {id:uid(), name, category:cat, rate, image:currentImage, createdBy:CUR.id, createdAt:new Date().toISOString()};
+      DB.products.push(p);
+      DB.godam.stock[p.id]=0;
+      await save('godam');
+    }
+    await save('products');
+    closeModal(); showToast('Product save ho gaya'); render('products');
+  });
+}
+async function delProduct(id){
+  if(!confirm('Product delete karein?')) return;
+  DB.products = DB.products.filter(p=>p.id!==id);
+  delete DB.godam.stock[id];
+  await save('products'); await save('godam');
+  showToast('Product delete ho gaya'); render('products');
+}
+
+/* ============================================================
+   BILLING
+============================================================ */
+let billItems = [];
+let editingBillId = null;
+let pendingEditBillId = null;
+function renderBilling(root){
+  root.innerHTML = `
+    <div class="pillTabs" id="billTabs">
+      <button class="active" data-t="new">Naya Bill</button>
+      <button data-t="list">Sab Bills</button>
+    </div>
+    <div id="billBody"></div>
+  `;
+  document.querySelectorAll('#billTabs button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#billTabs button').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    editingBillId = null;
+    b.dataset.t==='new' ? drawNewBill() : drawBillList();
+  }));
+  if(pendingEditBillId){
+    const eb = DB.bills.find(x=>x.id===pendingEditBillId);
+    pendingEditBillId = null;
+    if(eb){ drawNewBill(eb); }
+    else{ drawNewBill(); }
+  } else {
+    drawNewBill();
+  }
+
+  function drawNewBill(editBill){
+    const isEdit = !!editBill;
+    editingBillId = isEdit ? editBill.id : null;
+    billItems = isEdit ? editBill.items.map(it=>({productId:it.productId, qty:it.qty, rate:it.rate})) : [{productId:'',qty:1,rate:0}];
+    const custs = visibleCustomers().map(c=>({...c, balance: custBalance(c.id)}));
+    document.getElementById('billBody').innerHTML = `
+      <div class="card">
+        ${isEdit ? `<div style="margin-bottom:12px;"><span class="badge pending">Edit Mode</span></div>` : ''}
+        <div class="formGrid">
+          <label>Bill Type
+            <select id="bill_type">
+              <option value="sale" ${isEdit && editBill.type==='sale'?'selected':''}>Sale (Bill)</option>
+              <option value="return" ${isEdit && editBill.type==='return'?'selected':''}>Mal Wapsi (Return)</option>
+            </select>
+          </label>
+          <label>Customer
+            <div class="autoWrap">
+              <input type="text" id="bill_cust_txt" placeholder="Customer ka naam type karein..." value="${isEdit?customerName(editBill.customerId):''}">
+              <input type="hidden" id="bill_cust_id" value="${isEdit?editBill.customerId:''}">
+              <div class="autoList" id="bill_cust_list"></div>
+            </div>
+          </label>
+        </div>
+        <div id="bill_cust_info" style="display:none;margin-top:6px;padding:12px 14px;background:var(--paper);border:1px solid var(--border);border-radius:8px;font-size:13px;"></div>
+
+        <div class="sectionHead"><h3 style="font-size:14px;">Product Chunein</h3></div>
+        <div class="grid grid-4" id="productPicker" style="margin-bottom:6px;"></div>
+
+        <div class="sectionHead"><h3 style="font-size:14px;">Bill ke Items</h3><button class="btn btn-sm" id="addItemBtn">+ Manual Item</button></div>
+        <div class="itemsBox" id="itemsBox"></div>
+        <div class="totalLine"><span>Total</span><span class="mono" id="billTotalTxt">Rs 0</span></div>
+        <label style="display:block;margin-top:12px;">Note (optional)<textarea id="bill_note" rows="2" style="width:100%;">${isEdit?(editBill.note||''):''}</textarea></label>
+        <div id="bill_err" style="color:var(--danger);font-size:12.5px;margin-top:8px;"></div>
+        <div class="actions" style="justify-content:flex-start;margin-top:16px;">
+          <button class="btn btn-primary" id="saveBillBtn">${isEdit ? 'Update Bill' : (CUR.role==='ob' ? 'Save (Admin Approve Karega)' : 'Save Bill')}</button>
+          ${isEdit ? `<button class="btn" id="cancelEditBtn">Cancel Edit</button>` : ''}
+        </div>
+      </div>
+    `;
+    function showCustInfo(c){
+      const bal = custBalance(c.id, isEdit?editBill.id:undefined);
+      document.getElementById('bill_cust_info').style.display = 'block';
+      document.getElementById('bill_cust_info').innerHTML = `
+        <div class="grid grid-4" style="gap:10px;">
+          <div><div style="font-size:11px;color:var(--ink-soft);text-transform:uppercase;">ID</div><div class="mono" style="font-weight:700;">${customerCode(c)}</div></div>
+          <div><div style="font-size:11px;color:var(--ink-soft);text-transform:uppercase;">Mobile</div><div class="mono" style="font-weight:700;">${c.phone||'-'}</div></div>
+          <div><div style="font-size:11px;color:var(--ink-soft);text-transform:uppercase;">Current Balance</div><div class="mono" style="font-weight:700;color:${bal>0?'var(--maroon)':'var(--teal)'}">${balLine(bal)}</div></div>
+          <div><div style="font-size:11px;color:var(--ink-soft);text-transform:uppercase;">Address</div><div style="font-weight:600;">${c.address||'-'}</div></div>
+        </div>`;
+    }
+    attachAutocomplete('bill_cust_txt','bill_cust_list','bill_cust_id', custs, showCustInfo);
+    if(isEdit){
+      const c = DB.customers.find(x=>x.id===editBill.customerId);
+      if(c) showCustInfo(c);
+    }
+    drawProductPicker();
+    document.getElementById('addItemBtn').addEventListener('click',()=>{ billItems.push({productId:'',qty:1,rate:0}); drawItems(); });
+    drawItems();
+    document.getElementById('saveBillBtn').addEventListener('click', ()=>saveBill(isEdit?editBill:null));
+    if(isEdit) document.getElementById('cancelEditBtn').addEventListener('click', ()=>{ editingBillId=null; drawNewBill(); });
+
+    function drawProductPicker(){
+      const box = document.getElementById('productPicker');
+      if(!DB.products.length){ box.innerHTML = `<div class="empty card" style="grid-column:1/-1;padding:20px;">Koi product nahi mila</div>`; return; }
+      box.innerHTML = DB.products.map(p=>{
+        const st = stockOf(p.id);
+        return `<button type="button" class="card" data-pick="${p.id}" style="text-align:left;cursor:pointer;border:1px solid var(--border);display:flex;gap:10px;align-items:center;${st<=0?'opacity:.5;':''}" ${st<=0?'disabled':''}>
+          ${productThumb(p, 40)}
+          <div style="min-width:0;">
+            <div style="font-weight:700;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+            <div class="mono" style="font-size:13px;color:var(--maroon);">Rs ${money(p.rate)}</div>
+            <div style="font-size:11.5px;color:var(--ink-soft);">Stock: ${st}</div>
+          </div>
+        </button>`;
+      }).join('');
+      box.querySelectorAll('[data-pick]').forEach(btn=>btn.addEventListener('click',()=>{
+        const pid = btn.dataset.pick;
+        const p = DB.products.find(x=>x.id===pid);
+        const existing = billItems.find(it=>it.productId===pid);
+        if(existing){ existing.qty += 1; }
+        else{
+          const empty = billItems.find(it=>!it.productId);
+          if(empty){ empty.productId = pid; empty.qty = 1; empty.rate = p.rate; }
+          else{ billItems.push({productId:pid, qty:1, rate:p.rate}); }
+        }
+        drawItems();
+        showToast(`${p.name} bill mein add ho gaya`);
+      }));
+    }
+
+    function drawItems(){
+      const box = document.getElementById('itemsBox');
+      box.innerHTML = billItems.map((it,i)=>`
+        <div class="itemRow" data-i="${i}">
+          <select class="it_prod">
+            <option value="">— Product —</option>
+            ${DB.products.map(p=>`<option value="${p.id}" ${it.productId===p.id?'selected':''}>${p.name} — Rs${p.rate} (Stock: ${stockOf(p.id)})</option>`).join('')}
+          </select>
+          <input type="number" class="it_qty" value="${it.qty}" min="1">
+          <input type="number" class="it_rate" value="${it.rate}" min="0">
+          <div class="mono" style="text-align:right;">Rs ${money(it.qty*it.rate)}</div>
+          <button class="btn btn-ghost btn-sm" data-rm="${i}">✕</button>
+        </div>
+      `).join('');
+      box.querySelectorAll('.it_prod').forEach((sel,i)=>sel.addEventListener('change',e=>{
+        billItems[i].productId = e.target.value;
+        const p = DB.products.find(p=>p.id===e.target.value);
+        if(p) billItems[i].rate = p.rate;
+        drawItems();
+      }));
+      box.querySelectorAll('.it_qty').forEach((inp,i)=>inp.addEventListener('input',e=>{ billItems[i].qty = parseFloat(e.target.value)||0; updateTotal(); }));
+      box.querySelectorAll('.it_rate').forEach((inp,i)=>inp.addEventListener('input',e=>{ billItems[i].rate = parseFloat(e.target.value)||0; updateTotal(); }));
+      box.querySelectorAll('[data-rm]').forEach(b=>b.addEventListener('click',()=>{
+        billItems.splice(+b.dataset.rm,1);
+        if(!billItems.length) billItems.push({productId:'',qty:1,rate:0});
+        drawItems();
+      }));
+      updateTotal();
+    }
+    function updateTotal(){
+      const box = document.getElementById('itemsBox');
+      box.querySelectorAll('.itemRow').forEach((row,i)=>{
+        row.querySelector('.mono').textContent = 'Rs '+money(billItems[i].qty*billItems[i].rate);
+      });
+      const total = billItems.reduce((s,it)=>s+(it.qty*it.rate),0);
+      document.getElementById('billTotalTxt').textContent = 'Rs '+money(total);
+    }
+  }
+
+  async function saveBill(editBill){
+    const custId = document.getElementById('bill_cust_id').value;
+    const type = document.getElementById('bill_type').value;
+    const note = document.getElementById('bill_note').value.trim();
+    const err = document.getElementById('bill_err');
+    if(!custId){ err.textContent='Customer select karein'; return; }
+    const rawItems = billItems.filter(it=>it.productId && it.qty>0);
+    if(!rawItems.length){ err.textContent='Kam az kam ek item add karein'; return; }
+    const items = rawItems.map(it=>({productId:it.productId, name:productName(it.productId), qty:it.qty, rate:it.rate, amount:it.qty*it.rate}));
+    const total = items.reduce((s,it)=>s+it.amount,0);
+
+    if(!editBill){
+      // NEW BILL
+      if(type==='sale'){
+        for(const it of items){
+          if(it.qty > stockOf(it.productId)){
+            err.textContent = `"${it.name}" ka stock kaafi nahi (Available: ${stockOf(it.productId)})`;
+            return;
+          }
+        }
+      }
+      const status = CUR.role==='admin' ? 'approved' : 'pending';
+      const prevBalance = custBalance(custId);
+      const bill = {
+        id: uid(), customerId: custId, obId: CUR.role==='ob'?CUR.id:null, type, items, total, status, note,
+        createdBy: CUR.id, createdAt: new Date().toISOString(),
+        prevBalance, newBalance: status==='approved' ? prevBalance + (type==='sale'?total:-total) : null
+      };
+      DB.bills.push(bill);
+      await save('bills');
+      if(status==='approved') await applyStockForBill(bill, 1);
+      closeModalSafe();
+      showToast(status==='approved' ? 'Bill save ho gaya' : 'Bill admin ki approval ke liye bheja gaya');
+      const cst = DB.customers.find(c=>c.id===custId);
+      if(cst && cst.phone) waBill(bill.id);
+      document.querySelectorAll('#billTabs button')[0].click();
+      return;
+    }
+
+    // EDIT EXISTING BILL
+    const bill = DB.bills.find(x=>x.id===editBill.id);
+    if(!bill){ err.textContent='Bill nahi mili'; return; }
+    if(bill.status==='approved'){
+      // reverse old stock effect first (uses bill.items/type still OLD at this point)
+      await applyStockForBill(bill, -1);
+      if(type==='sale'){
+        const bad = items.find(it=>it.qty > stockOf(it.productId));
+        if(bad){
+          await applyStockForBill(bill, 1); // rollback reversal
+          err.textContent = `"${bad.name}" ka stock kaafi nahi (Available: ${stockOf(bad.productId)})`;
+          return;
+        }
+      }
+      bill.customerId = custId; bill.type = type; bill.items = items; bill.total = total; bill.note = note;
+      bill.prevBalance = custBalance(bill.customerId, bill.id);
+      bill.newBalance = bill.prevBalance + (bill.type==='sale' ? bill.total : -bill.total);
+      await applyStockForBill(bill, 1); // reapply with NEW items
+      await save('bills');
+    } else {
+      // pending bill — no stock/balance applied yet, just update fields
+      if(type==='sale'){
+        const bad = items.find(it=>it.qty > stockOf(it.productId));
+        if(bad){
+          err.textContent = `"${bad.name}" ka stock kaafi nahi (Available: ${stockOf(bad.productId)})`;
+          return;
+        }
+      }
+      bill.customerId = custId; bill.type = type; bill.items = items; bill.total = total; bill.note = note;
+      await save('bills');
+    }
+    editingBillId = null;
+    closeModalSafe();
+    showToast('Bill update ho gaya');
+    document.querySelectorAll('#billTabs button')[1].click();
+  }
+
+  function drawBillList(){
+    let list = [...visibleBills()].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+    let html = `<div class="tableWrap"><table><thead><tr><th>Tareekh</th><th>Customer</th><th>Type</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody>`;
+    if(!list.length){
+      document.getElementById('billBody').innerHTML = emptyBlock('🧾','Abhi tak koi bill nahi banaya gaya');
+      return;
+    }
+    list.forEach(b=>{
+      const canEdit = CUR.role==='admin' || (CUR.role==='ob' && b.status==='pending' && b.obId===CUR.id);
+      html += `<tr>
+        <td class="mono">${fmtDate(b.createdAt)}</td>
+        <td>${customerName(b.customerId)}</td>
+        <td>${b.type==='return'?'Mal Wapsi':'Sale'}</td>
+        <td class="mono">Rs ${money(b.total)}</td>
+        <td>${statusBadge(b.status)}</td>
+        <td style="white-space:nowrap">
+          <button class="btn btn-ghost btn-sm" data-view="${b.id}">👁️</button>
+          ${canEdit && b.status!=='rejected' ? `<button class="btn btn-ghost btn-sm" data-edit="${b.id}">✏️</button>` : ''}
+          <button class="btn btn-ghost btn-sm" data-wa="${b.id}">📱</button>
+          <button class="btn btn-ghost btn-sm" data-print="${b.id}">🖨️</button>
+        </td>
+      </tr>`;
+    });
+    html += `</tbody></table></div>`;
+    document.getElementById('billBody').innerHTML = html;
+    document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>viewBill(b.dataset.view)));
+    document.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click',()=>{
+      const bill = DB.bills.find(x=>x.id===b.dataset.edit);
+      document.querySelectorAll('#billTabs button')[0].click();
+      drawNewBill(bill);
+    }));
+    document.querySelectorAll('[data-wa]').forEach(b=>b.addEventListener('click',()=>waBill(b.dataset.wa)));
+    document.querySelectorAll('[data-print]').forEach(b=>b.addEventListener('click',()=>printBill(b.dataset.print)));
+  }
+}
+function closeModalSafe(){ closeModal(); }
+async function applyStockForBill(bill, sign){
+  // sign +1 apply, -1 reverse
+  bill.items.forEach(it=>{
+    const delta = bill.type==='return' ? it.qty : -it.qty;
+    DB.godam.stock[it.productId] = (DB.godam.stock[it.productId]||0) + delta*sign;
+  });
+  DB.godam.moves.push({id:uid(), type: bill.type==='return'?'wapsi':'sale', ref:bill.id, createdBy:CUR.id, createdAt:new Date().toISOString(), note:`${bill.type==='return'?'Mal wapsi':'Sale bill'} — ${customerName(bill.customerId)}`});
+  await save('godam');
+}
+function viewBill(id){
+  const b = DB.bills.find(x=>x.id===id);
+  if(!b) return;
+  const c = DB.customers.find(x=>x.id===b.customerId);
+  openModal(`
+    <h3>${b.type==='return'?'Mal Wapsi':'Bill'} — ${customerName(b.customerId)} ${stampBadge(b.status)}</h3>
+    <div class="mono" style="font-size:12px;color:var(--ink-soft);margin-bottom:10px;">ID: ${c?customerCode(c):'-'} • Mobile: ${c?c.phone||'-':'-'} • ${fmtDate(b.createdAt)} ${fmtTime(b.createdAt)} • By: ${personName(b.createdBy)}</div>
+    <table><thead><tr><th>Product</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody>
+      ${b.items.map(it=>`<tr><td>${it.name}</td><td class="mono">${it.qty}</td><td class="mono">${money(it.rate)}</td><td class="mono">${money(it.amount)}</td></tr>`).join('')}
+    </tbody></table>
+    <div class="totalLine"><span>Total</span><span class="mono">Rs ${money(b.total)}</span></div>
+    ${b.status==='approved' && b.prevBalance!==undefined ? `
+      <div style="margin-top:10px;font-size:13px;color:var(--ink-soft);">
+        <div>Pichla Balance: <strong class="mono">${balLine(b.prevBalance)}</strong></div>
+        <div>Naya Balance: <strong class="mono" style="color:var(--maroon)">${balLine(b.newBalance)}</strong></div>
+      </div>` : b.status==='pending' ? `<div style="margin-top:10px;font-size:12.5px;color:var(--ink-soft);">Approval ke baad balance update hoga</div>` : ''}
+    ${b.note?`<p style="font-size:13px;color:var(--ink-soft);margin-top:10px;">Note: ${b.note}</p>`:''}
+    <div class="actions">
+      ${(CUR.role==='admin' || (CUR.role==='ob' && b.status==='pending' && b.obId===CUR.id)) && b.status!=='rejected' ? `<button class="btn btn-teal" id="editBillBtn">✏️ Edit Bill</button>`:''}
+      ${CUR.role==='admin' && b.status==='approved' ? `<button class="btn btn-danger" id="delBillBtn">Delete Bill</button>`:''}
+      <button class="btn" onclick="closeModal()">Band Karein</button>
+    </div>
+  `);
+  const editBtn = document.getElementById('editBillBtn');
+  if(editBtn) editBtn.addEventListener('click', ()=>{
+    pendingEditBillId = b.id;
+    closeModal();
+    goto('billing');
+  });
+  const del = document.getElementById('delBillBtn');
+  if(del) del.addEventListener('click', async ()=>{
+    if(!confirm('Yeh bill delete karein? Stock wapas adjust ho jayega.')) return;
+    await applyStockForBill(b, -1);
+    DB.bills = DB.bills.filter(x=>x.id!==id);
+    await save('bills');
+    closeModal(); showToast('Bill delete ho gaya'); render('billing');
+  });
+}
+function waBill(id){
+  const b = DB.bills.find(x=>x.id===id);
+  const c = DB.customers.find(c=>c.id===b.customerId);
+  const balPart = b.status==='approved' && b.prevBalance!==undefined
+    ? `\nPichla Balance: Rs ${money(Math.abs(b.prevBalance))}${b.prevBalance>0?' (Baqi)':b.prevBalance<0?' (Advance)':''}\n*Naya Balance: Rs ${money(Math.abs(b.newBalance))}${b.newBalance>0?' (Baqi)':b.newBalance<0?' (Advance)':''}*`
+    : b.status==='pending' ? `\n(Yeh bill abhi admin ki approval ke liye pending hai)` : '';
+  const text = `*${b.type==='return'?'Mal Wapsi':'Bill'}*\nCustomer: ${c?c.name:''} (ID: ${c?customerCode(c):'-'})\nMobile: ${c?c.phone||'-':'-'}\nTareekh: ${fmtDate(b.createdAt)}\n\n${b.items.map(it=>`${it.name} — ${it.qty} x Rs${it.rate} = Rs${money(it.amount)}`).join('\n')}\n\n*Total: Rs ${money(b.total)}*${balPart}`;
+  window.open(waLink(c?c.phone:'', text), '_blank');
+}
+function printBill(id){
+  const b = DB.bills.find(x=>x.id===id);
+  const c = DB.customers.find(c=>c.id===b.customerId);
+  const w = window.open('','_blank');
+  const balHtml = b.status==='approved' && b.prevBalance!==undefined ? `
+    <p>Pichla Balance: Rs ${money(Math.abs(b.prevBalance))}${b.prevBalance>0?' (Baqi)':b.prevBalance<0?' (Advance)':''}<br>
+    <b>Naya Balance: Rs ${money(Math.abs(b.newBalance))}${b.newBalance>0?' (Baqi)':b.newBalance<0?' (Advance)':''}</b></p>` : '';
+  w.document.write(`<html><head><title>Bill</title><style>
+    body{font-family:sans-serif;padding:30px;color:#2B2420;} h2{margin-bottom:0;}
+    table{width:100%;border-collapse:collapse;margin-top:16px;} th,td{border-bottom:1px solid #ddd;padding:8px;text-align:left;}
+    .tot{font-weight:bold;font-size:18px;text-align:right;margin-top:14px;}
+  </style></head><body>
+    <h2>${b.type==='return'?'Mal Wapsi':'Bill'}</h2>
+    <p>Customer: <b>${c?c.name:''}</b> ${c?'(ID: '+customerCode(c)+')':''} ${c&&c.phone?'— '+c.phone:''}<br>Tareekh: ${fmtDate(b.createdAt)}</p>
+    <table><thead><tr><th>Product</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody>
+    ${b.items.map(it=>`<tr><td>${it.name}</td><td>${it.qty}</td><td>${money(it.rate)}</td><td>${money(it.amount)}</td></tr>`).join('')}
+    </tbody></table>
+    <div class="tot">Total: Rs ${money(b.total)}</div>
+    ${balHtml}
+  </body></html>`);
+  w.document.close(); w.print();
+}
+
+/* ============================================================
+   WASOLI
+============================================================ */
+function renderWasoli(root){
+  const custs = visibleCustomers().map(c=>({...c, balance: custBalance(c.id)}));
+  root.innerHTML = `
+    <div class="grid grid-2">
+      <div class="card">
+        <h3 style="margin-top:0;font-size:15px;">Nayi Wasoli Darj Karein</h3>
+        <label>Customer</label>
+        <div class="autoWrap" style="margin-bottom:10px;">
+          <input type="text" id="w_cust_txt" placeholder="Customer ka naam...">
+          <input type="hidden" id="w_cust_id">
+          <div class="autoList" id="w_cust_list"></div>
+        </div>
+        <div class="formGrid">
+          <label>Amount (Rs)<input type="number" id="w_amount"></label>
+          <label>Mode<select id="w_mode"><option>Cash</option><option>Bank Transfer</option><option>Cheque</option></select></label>
+        </div>
+        <div id="w_err" style="color:var(--danger);font-size:12.5px;margin-top:8px;"></div>
+        <div class="actions" style="justify-content:flex-start;">
+          <button class="btn btn-primary" id="w_save">${CUR.role==='ob'?'Save (Admin Approve Karega)':'Direct Save'}</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0;font-size:15px;">Aaj ki Wasoli Report</h3>
+        <div id="w_today"></div>
+        <button class="btn btn-teal btn-sm" id="w_reportWa" style="margin-top:12px;">📱 WhatsApp Par Bhejein</button>
+      </div>
+    </div>
+    <div class="sectionHead"><h3>Wasoli History</h3></div>
+    <div id="w_list"></div>
+  `;
+  attachAutocomplete('w_cust_txt','w_cust_list','w_cust_id', custs);
+  document.getElementById('w_save').addEventListener('click', async ()=>{
+    const custId = document.getElementById('w_cust_id').value;
+    const amount = parseFloat(document.getElementById('w_amount').value)||0;
+    const mode = document.getElementById('w_mode').value;
+    const err = document.getElementById('w_err');
+    if(!custId){ err.textContent='Customer select karein'; return; }
+    if(amount<=0){ err.textContent='Sahi amount darj karein'; return; }
+    const status = CUR.role==='admin' ? 'approved' : 'pending';
+    const prevBalance = custBalance(custId);
+    const entry = {id:uid(), customerId:custId, obId: CUR.role==='ob'?CUR.id:null, amount, mode, status, createdBy:CUR.id, createdAt:new Date().toISOString(),
+      prevBalance, newBalance: status==='approved' ? prevBalance - amount : null};
+    DB.wasoli.push(entry);
+    await save('wasoli');
+    showToast(status==='approved'?'Wasoli save ho gayi':'Wasoli admin ki approval ke liye bheji gayi');
+    const cst = DB.customers.find(c=>c.id===custId);
+    if(cst && cst.phone) waWasoli(entry.id);
+    render('wasoli');
+  });
+  drawToday(); drawList();
+  function drawToday(){
+    const today = todayStr();
+    const list = visibleWasoli().filter(w=>w.status==='approved' && w.createdAt.slice(0,10)===today);
+    const total = list.reduce((s,w)=>s+w.amount,0);
+    document.getElementById('w_today').innerHTML = list.length ? `
+      <div class="mono" style="font-size:22px;font-weight:700;color:var(--teal);margin-bottom:8px;">Rs ${money(total)}</div>
+      <div style="font-size:12.5px;color:var(--ink-soft);">${list.length} entries</div>
+    ` : `<div style="color:var(--ink-soft);font-size:13px;">Aaj tak koi wasoli darj nahi</div>`;
+    document.getElementById('w_reportWa').onclick = ()=>{
+      const text = `*Aaj ki Wasoli Report — ${fmtDate(new Date().toISOString())}*\n\n${list.map(w=>`${customerName(w.customerId)}: Rs ${money(w.amount)} (${w.mode})`).join('\n')}\n\n*Total: Rs ${money(total)}*`;
+      window.open(waLink('', text), '_blank');
+    };
+  }
+  function drawList(){
+    let list = [...visibleWasoli()].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+    if(!list.length){ document.getElementById('w_list').innerHTML = emptyBlock('💰','Abhi tak koi wasoli nahi'); return; }
+    let html = `<div class="tableWrap"><table><thead><tr><th>Tareekh</th><th>Customer</th><th>Amount</th><th>Mode</th><th>Wasoli Karne Wala</th><th>Status</th><th></th></tr></thead><tbody>`;
+    list.forEach(w=>{
+      html += `<tr>
+        <td class="mono">${fmtDate(w.createdAt)}</td>
+        <td>${customerName(w.customerId)}</td>
+        <td class="mono">Rs ${money(w.amount)}</td>
+        <td>${w.mode}</td>
+        <td>${personName(w.createdBy)}</td>
+        <td>${statusBadge(w.status)}</td>
+        <td><button class="btn btn-ghost btn-sm" data-wa="${w.id}">📱</button></td>
+      </tr>`;
+    });
+    html += `</tbody></table></div>`;
+    document.getElementById('w_list').innerHTML = html;
+    document.querySelectorAll('#w_list [data-wa]').forEach(b=>b.addEventListener('click',()=>waWasoli(b.dataset.wa)));
+  }
+}
+function waWasoli(id){
+  const w = DB.wasoli.find(x=>x.id===id);
+  const c = DB.customers.find(c=>c.id===w.customerId);
+  const balPart = w.status==='approved' && w.prevBalance!==undefined
+    ? `\nPichla Balance: Rs ${money(Math.abs(w.prevBalance))}${w.prevBalance>0?' (Baqi)':w.prevBalance<0?' (Advance)':''}\n*Naya Balance: Rs ${money(Math.abs(w.newBalance))}${w.newBalance>0?' (Baqi)':w.newBalance<0?' (Advance)':''}*`
+    : w.status==='pending' ? `\n(Yeh wasoli abhi admin ki approval ke liye pending hai)` : '';
+  const text = `*Wasoli Receipt*\nCustomer: ${c?c.name:''}\nAmount: Rs ${money(w.amount)}\nMode: ${w.mode}\nTareekh: ${fmtDate(w.createdAt)}\nWasoli Karne Wala: ${personName(w.createdBy)}${balPart}`;
+  window.open(waLink(c?c.phone:'', text), '_blank');
+}
+
+/* ============================================================
+   PENDING (admin only)
+============================================================ */
+function renderPending(root){
+  const pBills = DB.bills.filter(b=>b.status==='pending');
+  const pWasoli = DB.wasoli.filter(w=>w.status==='pending');
+  if(!pBills.length && !pWasoli.length){ root.innerHTML = emptyBlock('✅','Koi pending item nahi — sab clear hai!'); return; }
+  let html = '';
+  if(pBills.length){
+    html += `<div class="sectionHead"><h3>Pending Bills</h3></div><div class="tableWrap"><table><thead><tr><th>Tareekh</th><th>OB</th><th>Customer</th><th>Type</th><th>Total</th><th></th></tr></thead><tbody>`;
+    pBills.forEach(b=>{
+      html += `<tr>
+        <td class="mono">${fmtDate(b.createdAt)}</td>
+        <td>${OB_NAMES[b.obId]||b.obId}</td>
+        <td>${customerName(b.customerId)}</td>
+        <td>${b.type==='return'?'Mal Wapsi':'Sale'}</td>
+        <td class="mono">Rs ${money(b.total)}</td>
+        <td style="white-space:nowrap">
+          <button class="btn btn-ghost btn-sm" data-view-b="${b.id}">👁️</button>
+          <button class="btn btn-teal btn-sm" data-app-b="${b.id}">✔ Approve</button>
+          <button class="btn btn-danger btn-sm" data-rej-b="${b.id}">✕ Reject</button>
+        </td>
+      </tr>`;
+    });
+    html += `</tbody></table></div>`;
+  }
+  if(pWasoli.length){
+    html += `<div class="sectionHead"><h3>Pending Wasoli</h3></div><div class="tableWrap"><table><thead><tr><th>Tareekh</th><th>OB</th><th>Customer</th><th>Amount</th><th></th></tr></thead><tbody>`;
+    pWasoli.forEach(w=>{
+      html += `<tr>
+        <td class="mono">${fmtDate(w.createdAt)}</td>
+        <td>${OB_NAMES[w.obId]||w.obId}</td>
+        <td>${customerName(w.customerId)}</td>
+        <td class="mono">Rs ${money(w.amount)}</td>
+        <td style="white-space:nowrap">
+          <button class="btn btn-teal btn-sm" data-app-w="${w.id}">✔ Approve</button>
+          <button class="btn btn-danger btn-sm" data-rej-w="${w.id}">✕ Reject</button>
+        </td>
+      </tr>`;
+    });
+    html += `</tbody></table></div>`;
+  }
+  root.innerHTML = html;
+  root.querySelectorAll('[data-view-b]').forEach(b=>b.addEventListener('click',()=>viewBill(b.dataset.viewB)));
+  root.querySelectorAll('[data-app-b]').forEach(b=>b.addEventListener('click', async ()=>{
+    const bill = DB.bills.find(x=>x.id===b.dataset.appB);
+    const bad = bill.items.find(it => bill.type==='sale' && it.qty > stockOf(it.productId));
+    if(bad){ showToast(`⚠ "${bad.name}" ka stock kaafi nahi`); return; }
+    bill.prevBalance = custBalance(bill.customerId);
+    bill.newBalance = bill.prevBalance + (bill.type==='sale' ? bill.total : -bill.total);
+    bill.status='approved'; await save('bills'); await applyStockForBill(bill,1);
+    showToast('Bill approve ho gaya'); render('pending');
+  }));
+  root.querySelectorAll('[data-rej-b]').forEach(b=>b.addEventListener('click', async ()=>{
+    const bill = DB.bills.find(x=>x.id===b.dataset.rejB);
+    bill.status='rejected'; await save('bills');
+    showToast('Bill reject ho gaya'); render('pending');
+  }));
+  root.querySelectorAll('[data-app-w]').forEach(b=>b.addEventListener('click', async ()=>{
+    const w = DB.wasoli.find(x=>x.id===b.dataset.appW);
+    w.prevBalance = custBalance(w.customerId);
+    w.newBalance = w.prevBalance - w.amount;
+    w.status='approved'; await save('wasoli');
+    showToast('Wasoli approve ho gayi'); render('pending');
+  }));
+  root.querySelectorAll('[data-rej-w]').forEach(b=>b.addEventListener('click', async ()=>{
+    const w = DB.wasoli.find(x=>x.id===b.dataset.rejW);
+    w.status='rejected'; await save('wasoli');
+    showToast('Wasoli reject ho gayi'); render('pending');
+  }));
+}
+
+/* ============================================================
+   GODAM
+============================================================ */
+function renderGodam(root){
+  const canManage = CUR.role==='admin' || CUR.role==='stock';
+  let html = '';
+  if(canManage){
+    html += `<div class="card" style="margin-bottom:20px;">
+      <h3 style="margin-top:0;font-size:15px;">Stock Jama Karein</h3>
+      <div class="formGrid">
+        <label>Product<select id="g_prod">${DB.products.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</select></label>
+        <label>Quantity<input type="number" id="g_qty" min="1"></label>
+      </div>
+      <div class="actions" style="justify-content:flex-start;">
+        <button class="btn btn-primary" id="g_save">+ Stock Add Karein</button>
+      </div>
+    </div>`;
+  }
+  html += `<div class="sectionHead"><h3>Godam Stock</h3></div>`;
+  if(!DB.products.length){ html += emptyBlock('🏭','Pehle products add karein'); }
+  else{
+    html += `<div class="tableWrap"><table><thead><tr><th>Tasveer</th><th>Product</th><th>Category</th><th>Stock</th><th>Status</th></tr></thead><tbody>`;
+    DB.products.forEach(p=>{
+      const st = stockOf(p.id);
+      html += `<tr><td>${productThumb(p)}</td><td><strong>${p.name}</strong></td><td>${p.category||'-'}</td><td class="mono">${st}</td>
+      <td>${st<=0?'<span class="badge out">Out of Stock</span>':st<10?'<span class="badge low">Low Stock</span>':'<span class="badge ok">OK</span>'}</td></tr>`;
+    });
+    html += `</tbody></table></div>`;
+  }
+  html += `<div class="sectionHead"><h3>Stock Movements</h3></div>`;
+  const moves = [...DB.godam.moves].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,25);
+  if(!moves.length){ html += emptyBlock('📭','Abhi tak koi movement nahi'); }
+  else{
+    html += `<div class="tableWrap"><table><thead><tr><th>Tareekh</th><th>Type</th><th>Note</th><th>By</th></tr></thead><tbody>`;
+    moves.forEach(m=>{
+      const typeLabel = {jama:'Stock Jama', loading:'Gadi Loading', wapsi:'Mal Wapsi', sale:'Sale'}[m.type]||m.type;
+      html += `<tr><td class="mono">${fmtDate(m.createdAt)} ${fmtTime(m.createdAt)}</td><td>${typeLabel}</td><td>${m.note||'-'}</td><td>${OB_NAMES[m.createdBy]||m.createdBy}</td></tr>`;
+    });
+    html += `</tbody></table></div>`;
+  }
+  root.innerHTML = html;
+  if(canManage){
+    document.getElementById('g_save').addEventListener('click', async ()=>{
+      const pid = document.getElementById('g_prod').value;
+      const qty = parseFloat(document.getElementById('g_qty').value)||0;
+      if(!pid || qty<=0){ showToast('Product aur qty sahi darj karein'); return; }
+      DB.godam.stock[pid] = (DB.godam.stock[pid]||0) + qty;
+      DB.godam.moves.push({id:uid(), type:'jama', productId:pid, qty, createdBy:CUR.id, createdAt:new Date().toISOString(), note:`${productName(pid)} — ${qty} units jama`});
+      await save('godam');
+      showToast('Stock jama ho gaya'); render('godam');
+    });
+  }
+}
+
+/* ============================================================
+   LOADING SHEET
+============================================================ */
+let loadItems = [];
+function renderLoading(root){
+  loadItems = [{productId:'',qty:1}];
+  root.innerHTML = `
+    <div class="card">
+      <div class="formGrid">
+        <label class="full">Gadi / Vehicle Number<input type="text" id="l_vehicle" placeholder="e.g. LEA-4321"></label>
+      </div>
+      <div class="sectionHead"><h3 style="font-size:14px;">Loading Items</h3><button class="btn btn-sm" id="l_add">+ Item</button></div>
+      <div id="l_items"></div>
+      <div id="l_err" style="color:var(--danger);font-size:12.5px;margin-top:8px;"></div>
+      <div class="actions" style="justify-content:flex-start;">
+        <button class="btn btn-primary" id="l_save">Load Karein (Godam se Minus)</button>
+      </div>
+    </div>
+    <div class="sectionHead"><h3>Loading History</h3></div>
+    <div id="l_history"></div>
+  `;
+  document.getElementById('l_add').addEventListener('click',()=>{ loadItems.push({productId:'',qty:1}); drawItems(); });
+  drawItems();
+  document.getElementById('l_save').addEventListener('click', saveLoad);
+  drawHistory();
+
+  function drawItems(){
+    document.getElementById('l_items').innerHTML = loadItems.map((it,i)=>`
+      <div class="itemRow" style="grid-template-columns:2fr 100px 30px;" data-i="${i}">
+        <select class="li_prod"><option value="">— Product —</option>${DB.products.map(p=>`<option value="${p.id}" ${it.productId===p.id?'selected':''}>${p.name} (Stock: ${stockOf(p.id)})</option>`).join('')}</select>
+        <input type="number" class="li_qty" value="${it.qty}" min="1">
+        <button class="btn btn-ghost btn-sm" data-rm="${i}">✕</button>
+      </div>
+    `).join('');
+    document.querySelectorAll('.li_prod').forEach((s,i)=>s.addEventListener('change',e=>{ loadItems[i].productId=e.target.value; }));
+    document.querySelectorAll('.li_qty').forEach((s,i)=>s.addEventListener('input',e=>{ loadItems[i].qty=parseFloat(e.target.value)||0; }));
+    document.querySelectorAll('#l_items [data-rm]').forEach(b=>b.addEventListener('click',()=>{
+      loadItems.splice(+b.dataset.rm,1);
+      if(!loadItems.length) loadItems.push({productId:'',qty:1});
+      drawItems();
+    }));
+  }
+  async function saveLoad(){
+    const vehicle = document.getElementById('l_vehicle').value.trim();
+    const err = document.getElementById('l_err');
+    const items = loadItems.filter(it=>it.productId && it.qty>0);
+    if(!vehicle){ err.textContent='Gadi number darj karein'; return; }
+    if(!items.length){ err.textContent='Kam az kam ek item add karein'; return; }
+    for(const it of items){
+      if(it.qty > stockOf(it.productId)){ err.textContent = `"${productName(it.productId)}" ka stock kaafi nahi (Available: ${stockOf(it.productId)})`; return; }
+    }
+    items.forEach(it=>{
+      DB.godam.stock[it.productId] -= it.qty;
+      DB.godam.moves.push({id:uid(), type:'loading', productId:it.productId, qty:it.qty, createdBy:CUR.id, createdAt:new Date().toISOString(), note:`Gadi ${vehicle} — ${productName(it.productId)} x ${it.qty}`});
+    });
+    await save('godam');
+    err.textContent='';
+    showToast('Gadi load ho gayi, stock minus ho gaya');
+    render('loading');
+  }
+  function drawHistory(){
+    const moves = DB.godam.moves.filter(m=>m.type==='loading').sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,20);
+    if(!moves.length){ document.getElementById('l_history').innerHTML = emptyBlock('🚚','Abhi tak koi loading nahi hui'); return; }
+    let html = `<div class="tableWrap"><table><thead><tr><th>Tareekh</th><th>Note</th><th>By</th></tr></thead><tbody>`;
+    moves.forEach(m=>{ html += `<tr><td class="mono">${fmtDate(m.createdAt)} ${fmtTime(m.createdAt)}</td><td>${m.note}</td><td>${OB_NAMES[m.createdBy]||m.createdBy}</td></tr>`; });
+    html += `</tbody></table></div>`;
+    document.getElementById('l_history').innerHTML = html;
+  }
+}
+
+/* ============================================================
+   LEDGER
+============================================================ */
+function renderLedger(root){
+  const custs = visibleCustomers().map(c=>({...c, balance: custBalance(c.id)}));
+  root.innerHTML = `
+    <div class="autoWrap" style="max-width:360px;margin-bottom:18px;">
+      <input type="text" id="lg_cust_txt" placeholder="Customer select karein...">
+      <input type="hidden" id="lg_cust_id">
+      <div class="autoList" id="lg_cust_list"></div>
+    </div>
+    <div id="lg_body"></div>
+  `;
+  attachAutocomplete('lg_cust_txt','lg_cust_list','lg_cust_id', custs, (c)=>drawLedger(c.id));
+  document.getElementById('lg_body').innerHTML = emptyBlock('📒','Customer select karein poora hisab dekhne ke liye');
+
+  function drawLedger(custId){
+    const c = DB.customers.find(x=>x.id===custId);
+    const bills = DB.bills.filter(b=>b.customerId===custId && b.status==='approved');
+    const wasolis = DB.wasoli.filter(w=>w.customerId===custId && w.status==='approved');
+    const entries = [
+      ...bills.map(b=>({date:b.createdAt, desc:(b.type==='return'?'Mal Wapsi':'Bill'), debit: b.type==='sale'?b.total:0, credit: b.type==='return'?b.total:0})),
+      ...wasolis.map(w=>({date:w.createdAt, desc:`Wasoli (${w.mode}) — by ${personName(w.createdBy)}`, debit:0, credit:w.amount}))
+    ].sort((a,b)=>new Date(a.date)-new Date(b.date));
+    let bal = 0;
+    const rows = entries.map(e=>{ bal += e.debit - e.credit; return {...e, bal}; });
+    const finalBal = bal;
+    let html = `<div class="card" style="margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div><div style="font-size:18px;font-weight:700;">${c.name}</div><div class="mono" style="font-size:12.5px;color:var(--ink-soft);">${c.phone||'-'}</div></div>
+      <div style="text-align:right;">
+        <div style="font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:1px;">Current Balance</div>
+        <div class="mono" style="font-size:22px;font-weight:700;color:${finalBal>0?'var(--maroon)':'var(--teal)'}">Rs ${money(Math.abs(finalBal))} ${finalBal>0?'(Baqi)':finalBal<0?'(Advance)':''}</div>
+      </div>
+      <button class="btn btn-teal btn-sm" id="lg_wa">📱 WhatsApp Statement</button>
+      <button class="btn btn-sm" id="lg_print">🖨️ Print</button>
+    </div>`;
+    if(!rows.length){ html += emptyBlock('📭','Is customer ka koi transaction nahi'); }
+    else{
+      html += `<div class="tableWrap"><table><thead><tr><th>Tareekh</th><th>Tafseel</th><th>Debit</th><th>Credit</th><th>Balance</th></tr></thead><tbody>`;
+      rows.forEach(r=>{
+        html += `<tr><td class="mono">${fmtDate(r.date)}</td><td>${r.desc}</td>
+          <td class="mono">${r.debit?money(r.debit):'-'}</td>
+          <td class="mono">${r.credit?money(r.credit):'-'}</td>
+          <td class="mono">${money(Math.abs(r.bal))}${r.bal>=0?' Dr':' Cr'}</td></tr>`;
+      });
+      html += `</tbody></table></div>`;
+    }
+    document.getElementById('lg_body').innerHTML = html;
+    document.getElementById('lg_wa').addEventListener('click',()=>{
+      const text = `*Ledger Statement — ${c.name}*\n\n${rows.map(r=>`${fmtDate(r.date)} | ${r.desc} | ${r.debit?'Dr Rs'+money(r.debit):'Cr Rs'+money(r.credit)}`).join('\n')}\n\n*Balance: Rs ${money(Math.abs(finalBal))} ${finalBal>0?'(Baqi)':'(Advance)'}*`;
+      window.open(waLink(c.phone,text),'_blank');
+    });
+    document.getElementById('lg_print').addEventListener('click',()=>{
+      const w = window.open('','_blank');
+      w.document.write(`<html><head><title>Ledger</title><style>body{font-family:sans-serif;padding:30px;}table{width:100%;border-collapse:collapse;margin-top:14px;}th,td{border-bottom:1px solid #ddd;padding:8px;text-align:left;}</style></head><body>
+      <h2>Ledger — ${c.name}</h2><p>${c.phone||''}</p>
+      <table><thead><tr><th>Tareekh</th><th>Tafseel</th><th>Debit</th><th>Credit</th><th>Balance</th></tr></thead><tbody>
+      ${rows.map(r=>`<tr><td>${fmtDate(r.date)}</td><td>${r.desc}</td><td>${r.debit?money(r.debit):'-'}</td><td>${r.credit?money(r.credit):'-'}</td><td>${money(Math.abs(r.bal))}${r.bal>=0?' Dr':' Cr'}</td></tr>`).join('')}
+      </tbody></table><h3>Balance: Rs ${money(Math.abs(finalBal))} ${finalBal>0?'(Baqi)':'(Advance)'}</h3>
+      </body></html>`);
+      w.document.close(); w.print();
+    });
+  }
+}
+
+/* ============================================================
+   DAILY HISAB
+============================================================ */
+function renderHisab(root){
+  const today = todayStr();
+  root.innerHTML = `
+    <div class="card" style="margin-bottom:20px;">
+      <h3 style="margin-top:0;font-size:15px;">Entry Darj Karein</h3>
+      <div class="formGrid">
+        <label>Type<select id="h_type"><option value="kharcha">Kharcha</option><option value="company_payment">Company Payment</option></select></label>
+        <label>Amount (Rs)<input type="number" id="h_amount"></label>
+        <label class="full">Note<input type="text" id="h_note" placeholder="Tafseel..."></label>
+      </div>
+      <div class="actions" style="justify-content:flex-start;"><button class="btn btn-primary" id="h_save">Save</button></div>
+    </div>
+    <div id="h_summary" class="grid grid-4" style="margin-bottom:24px;"></div>
+    <div class="sectionHead"><h3>Aaj ka Hisab</h3><button class="btn btn-sm" id="h_print">🖨️ Print</button></div>
+    <div id="h_list"></div>
+  `;
+  document.getElementById('h_save').addEventListener('click', async ()=>{
+    const type = document.getElementById('h_type').value;
+    const amount = parseFloat(document.getElementById('h_amount').value)||0;
+    const note = document.getElementById('h_note').value.trim();
+    if(amount<=0){ showToast('Sahi amount darj karein'); return; }
+    DB.hisab.push({id:uid(), type, amount, note, createdBy:CUR.id, createdAt:new Date().toISOString()});
+    await save('hisab');
+    showToast('Entry save ho gayi'); render('hisab');
+  });
+  document.getElementById('h_print').addEventListener('click',()=>window.print());
+  draw();
+  function draw(){
+    const wasoliToday = DB.wasoli.filter(w=>w.status==='approved' && w.createdAt.slice(0,10)===today);
+    const wTotal = wasoliToday.reduce((s,w)=>s+w.amount,0);
+    const hToday = DB.hisab.filter(h=>h.createdAt.slice(0,10)===today);
+    const kharcha = hToday.filter(h=>h.type==='kharcha').reduce((s,h)=>s+h.amount,0);
+    const company = hToday.filter(h=>h.type==='company_payment').reduce((s,h)=>s+h.amount,0);
+    document.getElementById('h_summary').innerHTML = `
+      <div class="card statCard teal"><div class="label">Aaj ki Wasoli</div><div class="value mono">Rs ${money(wTotal)}</div></div>
+      <div class="card statCard maroon"><div class="label">Kharcha</div><div class="value mono">Rs ${money(kharcha)}</div></div>
+      <div class="card statCard gold"><div class="label">Company Payment</div><div class="value mono">Rs ${money(company)}</div></div>
+      <div class="card statCard ink"><div class="label">Bacha Hua Cash</div><div class="value mono">Rs ${money(wTotal-kharcha-company)}</div></div>
+    `;
+    if(!hToday.length && !wasoliToday.length){ document.getElementById('h_list').innerHTML = emptyBlock('📅','Aaj ka koi hisab darj nahi'); return; }
+    let html = `<div class="tableWrap"><table><thead><tr><th>Waqt</th><th>Type</th><th>Amount</th><th>Note</th></tr></thead><tbody>`;
+    wasoliToday.forEach(w=>{ html += `<tr><td class="mono">${fmtTime(w.createdAt)}</td><td>Wasoli</td><td class="mono" style="color:var(--teal)">+${money(w.amount)}</td><td>${customerName(w.customerId)}</td></tr>`; });
+    hToday.forEach(h=>{ html += `<tr><td class="mono">${fmtTime(h.createdAt)}</td><td>${h.type==='kharcha'?'Kharcha':'Company Payment'}</td><td class="mono" style="color:var(--maroon)">-${money(h.amount)}</td><td>${h.note||'-'}</td></tr>`; });
+    html += `</tbody></table></div>`;
+    document.getElementById('h_list').innerHTML = html;
+  }
+}
+
+/* ============================================================
+   OB TARGETS
+============================================================ */
+function renderTargets(root){
+  const m = monthStr();
+  function salesFor(obId){
+    return DB.bills.filter(b=>b.obId===obId && b.status==='approved' && b.type==='sale' && b.createdAt.slice(0,7)===m).reduce((s,b)=>s+b.total,0);
+  }
+  function circleSvg(pct, color){
+    pct = Math.min(100,Math.max(0,pct));
+    const r=54, c=2*Math.PI*r;
+    return `<svg width="130" height="130" viewBox="0 0 130 130">
+      <circle cx="65" cy="65" r="${r}" fill="none" stroke="var(--border)" stroke-width="12"/>
+      <circle cx="65" cy="65" r="${r}" fill="none" stroke="${color}" stroke-width="12" stroke-linecap="round"
+        stroke-dasharray="${c}" stroke-dashoffset="${c-(pct/100)*c}" transform="rotate(-90 65 65)"/>
+      <text x="65" y="70" text-anchor="middle" font-family="IBM Plex Mono" font-size="20" font-weight="700" fill="var(--ink)">${Math.round(pct)}%</text>
+    </svg>`;
+  }
+  if(CUR.role==='admin'){
+    let html = `<div class="sectionHead"><h3>Monthly Target Set Karein (${m})</h3></div>
+      <div class="grid grid-2">`;
+    OB_IDS.forEach(obId=>{
+      const t = (DB.targets[obId] && DB.targets[obId][m]) || 0;
+      html += `<div class="card">
+        <div style="font-weight:700;margin-bottom:10px;">${OB_NAMES[obId]}</div>
+        <div class="formGrid">
+          <label class="full">Target (Rs)<input type="number" id="t_${obId}" value="${t||''}" placeholder="e.g. 500000"></label>
+        </div>
+        <button class="btn btn-primary btn-sm" data-setob="${obId}" style="margin-top:8px;">Save Target</button>
+      </div>`;
+    });
+    html += `</div><div class="sectionHead"><h3>Progress</h3></div><div class="circleWrap">`;
+    OB_IDS.forEach(obId=>{
+      const t = (DB.targets[obId] && DB.targets[obId][m]) || 0;
+      const s = salesFor(obId);
+      const pct = t ? (s/t*100) : 0;
+      html += `<div class="card" style="text-align:center;">
+        ${circleSvg(pct, pct>=100?'var(--teal)':'var(--maroon)')}
+        <div style="font-weight:700;margin-top:8px;">${OB_NAMES[obId]}</div>
+        <div class="mono" style="font-size:12.5px;color:var(--ink-soft);">Rs ${money(s)} / Rs ${money(t)}</div>
+      </div>`;
+    });
+    html += `</div>`;
+    root.innerHTML = html;
+    OB_IDS.forEach(obId=>{
+      const btn = root.querySelector(`[data-setob="${obId}"]`);
+      btn.addEventListener('click', async ()=>{
+        const val = parseFloat(document.getElementById(`t_${obId}`).value)||0;
+        if(!DB.targets[obId]) DB.targets[obId]={};
+        DB.targets[obId][m] = val;
+        await save('targets');
+        showToast('Target save ho gaya'); render('targets');
+      });
+    });
+  } else if(CUR.role==='ob'){
+    const t = (DB.targets[CUR.id] && DB.targets[CUR.id][m]) || 0;
+    const s = salesFor(CUR.id);
+    const pct = t ? (s/t*100) : 0;
+    root.innerHTML = `<div class="card" style="text-align:center;max-width:340px;">
+      ${circleSvg(pct, pct>=100?'var(--teal)':'var(--maroon)')}
+      <div style="font-weight:700;margin-top:10px;font-size:16px;">${m} Progress</div>
+      <div class="mono" style="margin-top:6px;">Rs ${money(s)} / Rs ${money(t)}</div>
+      ${!t? `<div style="color:var(--ink-soft);font-size:12.5px;margin-top:10px;">Admin ne abhi target set nahi kiya</div>`:''}
+    </div>`;
+  }
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+renderPinDisplay();
+</script>
+</body>
+</html>
